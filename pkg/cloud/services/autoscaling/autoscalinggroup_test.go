@@ -571,7 +571,7 @@ func TestServiceCreateASG(t *testing.T) {
 				mps.AWSMachinePool.Spec.MaxSize = 5
 				mps.MachinePool.Spec.Replicas = aws.Int32(1)
 				mps.MachinePool.Annotations = map[string]string{
-					scope.ReplicasManagedByAnnotation: scope.ExternalAutoscalerReplicasManagedByAnnotationValue,
+					clusterv1.ReplicasManagedByAnnotation: "", // empty value counts as true (= externally managed)
 				}
 			},
 			wantErr: false,
@@ -593,7 +593,7 @@ func TestServiceCreateASG(t *testing.T) {
 				mps.AWSMachinePool.Spec.MaxSize = 5
 				mps.MachinePool.Spec.Replicas = aws.Int32(6)
 				mps.MachinePool.Annotations = map[string]string{
-					scope.ReplicasManagedByAnnotation: scope.ExternalAutoscalerReplicasManagedByAnnotationValue,
+					clusterv1.ReplicasManagedByAnnotation: "truthy",
 				}
 			},
 			wantErr: false,
@@ -738,7 +738,7 @@ func TestServiceUpdateASG(t *testing.T) {
 			machinePoolName: "update-asg-externally-managed-replicas-annotation",
 			wantErr:         false,
 			setupMachinePoolScope: func(mps *scope.MachinePoolScope) {
-				mps.MachinePool.SetAnnotations(map[string]string{scope.ReplicasManagedByAnnotation: "anything-that-is-not-false"})
+				mps.MachinePool.SetAnnotations(map[string]string{clusterv1.ReplicasManagedByAnnotation: "anything-that-is-not-false"})
 
 				mps.MachinePool.Spec.Replicas = pointer.Int32(40)
 				mps.AWSMachinePool.Spec.MinSize = 20

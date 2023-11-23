@@ -34,6 +34,7 @@ import (
 	"sigs.k8s.io/cluster-api-provider-aws/v2/pkg/cloud/converters"
 	"sigs.k8s.io/cluster-api-provider-aws/v2/pkg/cloud/scope"
 	"sigs.k8s.io/cluster-api-provider-aws/v2/pkg/record"
+	"sigs.k8s.io/cluster-api/util/annotations"
 )
 
 // SDKToAutoScalingGroup converts an AWS EC2 SDK AutoScalingGroup to the CAPA AutoScalingGroup type.
@@ -177,7 +178,7 @@ func (s *Service) CreateASG(machinePoolScope *scope.MachinePoolScope) (*expinfra
 	// Ignore the problem for externally managed clusters because MachinePool replicas will be updated to the right value automatically.
 	if mpReplicas >= machinePoolScope.AWSMachinePool.Spec.MinSize && mpReplicas <= machinePoolScope.AWSMachinePool.Spec.MaxSize {
 		input.DesiredCapacity = &mpReplicas
-	} else if !scope.ReplicasExternallyManaged(machinePoolScope.MachinePool) {
+	} else if !annotations.ReplicasManagedByExternalAutoscaler(machinePoolScope.MachinePool) {
 		return nil, fmt.Errorf("incorrect number of replicas %d in MachinePool %v", mpReplicas, machinePoolScope.MachinePool.Name)
 	}
 
@@ -298,7 +299,7 @@ func (s *Service) UpdateASG(machinePoolScope *scope.MachinePoolScope) error {
 		CapacityRebalance:    aws.Bool(machinePoolScope.AWSMachinePool.Spec.CapacityRebalance),
 	}
 
-	if machinePoolScope.MachinePool.Spec.Replicas != nil && !scope.ReplicasExternallyManaged(machinePoolScope.MachinePool) {
+	if machinePoolScope.MachinePool.Spec.Replicas != nil && !annotations.ReplicasManagedByExternalAutoscaler(machinePoolScope.MachinePool) {
 		input.DesiredCapacity = aws.Int64(int64(*machinePoolScope.MachinePool.Spec.Replicas))
 	}
 
