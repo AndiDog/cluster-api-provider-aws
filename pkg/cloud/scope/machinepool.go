@@ -407,5 +407,5 @@ func (m *MachinePoolScope) GetRuntimeObject() runtime.Object {
 
 func ReplicasExternallyManaged(mp *expclusterv1.MachinePool) bool {
 	val, ok := mp.Annotations[ReplicasManagedByAnnotation]
-	return ok && val == ExternalAutoscalerReplicasManagedByAnnotationValue
+	return ok && val != "false"
 }
