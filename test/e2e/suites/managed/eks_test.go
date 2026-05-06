@@ -106,7 +106,7 @@ var _ = ginkgo.Describe("[managed] [general] EKS cluster tests", func() {
 				AWSSession:            e2eCtx.BootstrapUserAWSSession,
 				Namespace:             namespace,
 				ClusterName:           clusterName,
-				Replicas:              1,
+				Replicas:              2,
 				Cleanup:               true,
 			}
 		})
